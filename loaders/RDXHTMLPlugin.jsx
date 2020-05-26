@@ -3,49 +3,37 @@ import HTMLConfig from './HTMLConfig';
 
 export default class RDXHTMLPlugin {
   static PLUGIN_NAME = 'RDXHTMLPlugin';
-  htmlFullFilePathList;
 
-  constructor(config = {}) {
-    Object.assign(this, config);
+  getModuleBuilder = compilation => module => {
+    const {
+      context: fullContextPath = '',
+      request: fullFilePath = ''
+    } = module;
 
-    this.htmlFullFilePathList = this.htmlFullFilePathList || [];
-  }
+    if (/\.htm$/i.test(fullFilePath)) {
+      const htmlConfig = new HTMLConfig({
+        content: FS.readFileSync(fullFilePath, {encoding: 'utf8'}),
+        fullFilePath,
+        fullContextPath
+      });
+      const {
+        content = '',
+        relativeHTMLPath
+      } = htmlConfig.getCurrentData();
+
+      compilation.assets[relativeHTMLPath] = {
+        source: () => content,
+        size: () => content.length
+      };
+    }
+  };
+
+  configureCompilation = compilation => {
+    compilation.hooks.buildModule.tap(RDXHTMLPlugin.PLUGIN_NAME, this.getModuleBuilder(compilation));
+    compilation.hooks.rebuildModule.tap(RDXHTMLPlugin.PLUGIN_NAME, this.getModuleBuilder(compilation));
+  };
 
   apply = (compiler) => {
-    compiler.hooks.entryOption.tap(
-      RDXHTMLPlugin.PLUGIN_NAME,
-      (context, entry) => {
-        const htmlConfigMap = this.htmlFullFilePathList
-          .reduce((acc, fullHTMLFilePath = '') => {
-            const htmlConfig = new HTMLConfig({
-              content: '',
-              fullFilePath: fullHTMLFilePath,
-              fullContextPath: context
-            });
-            const updateContent = () => {
-              htmlConfig.content = FS.readFileSync(fullHTMLFilePath, {encoding: 'utf8'});
-            };
-
-            return {
-              ...acc,
-              [fullHTMLFilePath]: {
-                htmlConfig,
-                updateContent
-              }
-            };
-          }, {});
-      }
-    );
-    compiler.hooks.compilation.tap(
-      RDXHTMLPlugin.PLUGIN_NAME,
-      compilation => {
-        compilation.hooks.buildModule.tap(
-          RDXHTMLPlugin.PLUGIN_NAME,
-          module => {
-            const htmlConfig = {};
-          }
-        );
-      }
-    );
+    compiler.hooks.compilation.tap(RDXHTMLPlugin.PLUGIN_NAME, this.configureCompilation);
   };
 }

@@ -1,5 +1,6 @@
 require('resistdesign-babel-register');
 const Path = require('path');
+const {getEntryMapFromHTMLFileList} = require('./loaders/HTMLConfig');
 const RDXHTMLPlugin = require('./loaders/RDXHTMLPlugin');
 
 const context = Path.resolve(__dirname, 'src');
@@ -10,7 +11,10 @@ const htmlFullFilePathList = [
 
 module.exports = {
   mode: 'development',
-  entry: {},
+  entry: getEntryMapFromHTMLFileList(
+    htmlFullFilePathList,
+    context
+  ),
   context,
   resolve: {
     extensions: [
@@ -25,13 +29,12 @@ module.exports = {
     path: Path.resolve('./public')
   },
   plugins: [
-    new RDXHTMLPlugin({
-      htmlFullFilePathList
-    })
+    new RDXHTMLPlugin()
   ],
   module: {
     rules: [
       {
+        exclude: /\.html$/i,
         loader: require.resolve('file-loader'),
         options: {
           name: '[path][name].[ext]?[contenthash]',

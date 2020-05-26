@@ -13,6 +13,20 @@ export const includeDotInRelativePath = (relativePath) => Path.isAbsolute(relati
 relativePath.indexOf(`..${Path.sep}`) === 0 ?
   relativePath :
   `.${Path.sep}${relativePath}`;
+export const getEntryMapFromHTMLFileList = (htmlFileList = [], context = '') => htmlFileList
+  .reduce((acc, k) => {
+    const entry = includeDotInRelativePath(
+      Path.relative(
+        context,
+        k
+      )
+    );
+
+    return {
+      ...acc,
+      [entry]: entry
+    };
+  }, {});
 export const getRelativeImportOutputPath = ({
                                               fullContextPath = '',
                                               fullRequesterFilePath = '',
@@ -101,10 +115,7 @@ export default class HTMLConfig {
         this.fullFilePath
       )
     );
-    const entry = {
-      // Supply the entry for the HTML file itself.
-      [relativeHTMLPath]: relativeHTMLPath
-    };
+    const entry = {};
     const workerEntry = {};
     const baseHTMLReferencePathProcessorConfig = {
       parser,
@@ -131,6 +142,7 @@ export default class HTMLConfig {
     return {
       contentHash,
       content: parser.html(),
+      relativeHTMLPath,
       entry,
       workerEntry
     };
