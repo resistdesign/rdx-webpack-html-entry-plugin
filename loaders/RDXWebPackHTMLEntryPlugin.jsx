@@ -1,19 +1,12 @@
 import HTMLConfig from './HTMLConfig';
 
 const HTML_EXT_REGEX = /\.html?$/i;
-const removeHTMLEntries = (context = '', entry = {}) => {
-  for (const k in entry) {
-    if (entry.hasOwnProperty(k) && HTML_EXT_REGEX.test(k)) {
-      delete entry[k];
-    }
-  }
-};
 
 export default class RDXWebPackHTMLEntryPlugin {
   static PLUGIN_NAME = 'RDXWebPackHTMLEntryPlugin';
   static HTML_EXT_REGEX = HTML_EXT_REGEX;
 
-  getModuleBuilder = compilation => module => {
+  getModuleBuilder = compilation => mod => {
     const {
       assets,
       compiler: {
@@ -23,9 +16,9 @@ export default class RDXWebPackHTMLEntryPlugin {
     } = compilation;
     const {
       request: fullFilePath = ''
-    } = module;
+    } = mod;
 
-    console.log(Object.keys(compilation.compiler));
+    console.log(Object.keys(mod));
 
     if (HTML_EXT_REGEX.test(fullFilePath)) {
       const htmlConfig = new HTMLConfig({
@@ -51,7 +44,6 @@ export default class RDXWebPackHTMLEntryPlugin {
   };
 
   apply = (compiler) => {
-    compiler.hooks.entryOption.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, removeHTMLEntries);
     compiler.hooks.compilation.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, this.configureCompilation);
   };
 }
