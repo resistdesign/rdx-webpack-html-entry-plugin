@@ -30,9 +30,7 @@ module.exports = {
     path: Path.resolve('./public')
   },
   plugins: [
-    new CleanWebpackPlugin({
-      cleanStaleWebpackAssets: false
-    }),
+    new CleanWebpackPlugin(),
     new RDXWebPackHTMLEntryPlugin()
   ],
   module: {

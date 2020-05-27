@@ -35,22 +35,17 @@ export default class RDXWebPackHTMLEntryPlugin {
         ...workerEntry
       };
       const currentAsset = compilation.getAsset(relativeHTMLPath);
+      const assetSource = mod.createSourceForAsset(relativeHTMLPath, content);
 
       if (!currentAsset) {
         compilation.emitAsset(
           relativeHTMLPath,
-          {
-            source: () => content,
-            size: () => content.length
-          }
+          assetSource
         );
       } else {
         compilation.updateAsset(
           relativeHTMLPath,
-          {
-            source: () => content,
-            size: () => content.length
-          }
+          assetSource
         );
       }
 
