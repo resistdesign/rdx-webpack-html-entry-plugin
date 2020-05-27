@@ -1,7 +1,7 @@
 require('resistdesign-babel-register');
 const Path = require('path');
 const {getEntryMapFromHTMLFileList} = require('./loaders/HTMLConfig');
-const RDXHTMLPlugin = require('./loaders/RDXHTMLPlugin');
+const RDXWebPackHTMLEntryPlugin = require('./loaders/RDXWebPackHTMLEntryPlugin');
 
 const context = Path.resolve(__dirname, 'src');
 const htmlFullFilePathList = [
@@ -29,7 +29,7 @@ module.exports = {
     path: Path.resolve('./public')
   },
   plugins: [
-    new RDXHTMLPlugin()
+    new RDXWebPackHTMLEntryPlugin()
   ],
   module: {
     rules: [
