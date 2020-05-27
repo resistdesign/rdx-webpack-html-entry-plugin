@@ -34,7 +34,7 @@ module.exports = {
   module: {
     rules: [
       {
-        exclude: /\.html$/i,
+        exclude: RDXWebPackHTMLEntryPlugin.HTML_EXT_REGEX,
         loader: require.resolve('file-loader'),
         options: {
           name: '[path][name].[ext]?[contenthash]',
