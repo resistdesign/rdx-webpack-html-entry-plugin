@@ -20,6 +20,8 @@ export default class RDXWebPackHTMLEntryPlugin {
       request: fullFilePath = ''
     } = mod;
 
+    console.log('>>>   INFO:', Object.keys(compilation.compiler));
+
     if (HTML_EXT_REGEX.test(fullFilePath)) {
       const htmlConfig = new HTMLConfig({
         content: inputFileSystem.readFileSync(fullFilePath, {encoding: 'utf8'}),
@@ -49,6 +51,8 @@ export default class RDXWebPackHTMLEntryPlugin {
           dependencies.push(newDep);
         }
       }
+
+      mod.type = 'asset/resource';
     }
   };
 

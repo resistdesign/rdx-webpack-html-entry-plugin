@@ -1,5 +1,6 @@
 require('resistdesign-babel-register');
 const Path = require('path');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const {getEntryMapFromHTMLFileList} = require('./loaders/HTMLConfig');
 const RDXWebPackHTMLEntryPlugin = require('./loaders/RDXWebPackHTMLEntryPlugin');
 
@@ -29,6 +30,9 @@ module.exports = {
     path: Path.resolve('./public')
   },
   plugins: [
+    new CleanWebpackPlugin({
+      cleanStaleWebpackAssets: false
+    }),
     new RDXWebPackHTMLEntryPlugin()
   ],
   module: {
