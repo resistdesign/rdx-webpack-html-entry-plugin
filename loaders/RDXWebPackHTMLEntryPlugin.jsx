@@ -28,8 +28,14 @@ export default class RDXWebPackHTMLEntryPlugin {
       });
       const {
         content = '',
-        relativeHTMLPath
+        relativeHTMLPath,
+        entry,
+        workerEntry
       } = htmlConfig.getCurrentData();
+      const depMap = {
+        ...entry,
+        ...workerEntry
+      };
 
       assets[relativeHTMLPath] = {
         source: () => content,
