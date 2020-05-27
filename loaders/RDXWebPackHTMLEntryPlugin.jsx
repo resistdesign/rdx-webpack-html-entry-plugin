@@ -9,7 +9,6 @@ export default class RDXWebPackHTMLEntryPlugin {
 
   getModuleBuilder = compilation => mod => {
     const {
-      assets,
       compiler: {
         context: fullContextPath = ''
       } = {},
@@ -19,8 +18,6 @@ export default class RDXWebPackHTMLEntryPlugin {
       dependencies = [],
       request: fullFilePath = ''
     } = mod;
-
-    console.log('>>>   INFO:', Object.keys(compilation.compiler));
 
     if (HTML_EXT_REGEX.test(fullFilePath)) {
       const htmlConfig = new HTMLConfig({
@@ -38,11 +35,25 @@ export default class RDXWebPackHTMLEntryPlugin {
         ...entry,
         ...workerEntry
       };
+      const currentAsset = compilation.getAsset(relativeHTMLPath);
 
-      assets[relativeHTMLPath] = {
-        source: () => content,
-        size: () => content.length
-      };
+      if (!currentAsset) {
+        compilation.emitAsset(
+          relativeHTMLPath,
+          {
+            source: () => content,
+            size: () => content.length
+          }
+        );
+      } else {
+        compilation.updateAsset(
+          relativeHTMLPath,
+          {
+            source: () => content,
+            size: () => content.length
+          }
+        );
+      }
 
       for (const dN in depMap) {
         if (depMap.hasOwnProperty(dN)) {
@@ -51,8 +62,6 @@ export default class RDXWebPackHTMLEntryPlugin {
           dependencies.push(newDep);
         }
       }
-
-      mod.type = 'asset/resource';
     }
   };
 
