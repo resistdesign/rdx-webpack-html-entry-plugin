@@ -12,7 +12,7 @@ const htmlFullFilePathList = [
 
 module.exports = {
   mode: 'development',
-  entry: getEntryMapFromHTMLFileList(
+  entry: () => getEntryMapFromHTMLFileList(
     htmlFullFilePathList,
     context
   ),
