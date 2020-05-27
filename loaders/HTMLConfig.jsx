@@ -27,20 +27,6 @@ export const getEntryMapFromHTMLFileList = (htmlFileList = [], context = '') => 
       [entry]: entry
     };
   }, {});
-export const getRelativeImportOutputPath = ({
-                                              fullContextPath = '',
-                                              fullRequesterFilePath = '',
-                                              relativeImportPath = ''
-                                            } = {}) => includeDotInRelativePath(
-  Path
-    .join(
-      Path.relative(
-        fullContextPath,
-        Path.dirname(fullRequesterFilePath)
-      ),
-      relativeImportPath
-    )
-);
 export const getContentHash = (content = '') => {
   const hash = Crypto.createHash('sha256');
 
@@ -51,8 +37,6 @@ export const getContentHash = (content = '') => {
 export const getHTMLReferencePathProcessor = ({
                                                 parser = {},
                                                 attrName = '',
-                                                fullFilePath = '',
-                                                fullContextPath = '',
                                                 contentHash = '',
                                                 entry = {},
                                                 workerEntry = {}
@@ -63,11 +47,6 @@ export const getHTMLReferencePathProcessor = ({
   const rel = `${elem.attr('rel')}`.toLowerCase();
   const asValue = `${elem.attr('as')}`.toLowerCase();
   const sourceIsWorker = asValue === HTML_PROCESSING_FLAGS.WORKER;
-  const outputPath = getRelativeImportOutputPath({
-    fullContextPath: fullContextPath,
-    fullRequesterFilePath: fullFilePath,
-    relativeImportPath: sourcePath
-  });
 
   if (
     // Skip the base tag.
@@ -83,12 +62,11 @@ export const getHTMLReferencePathProcessor = ({
       )
     )
   ) {
-    console.log('OUTPUT PATH:', outputPath);
     if (sourceIsWorker) {
       // Sort out Web Workers for separate compilation.
-      workerEntry[outputPath] = outputPath;
+      workerEntry[sourcePath] = sourcePath;
     } else {
-      entry[outputPath] = outputPath;
+      entry[sourcePath] = sourcePath;
     }
 
     elem.attr(attrName, `${sourcePath}?${contentHash}`);
