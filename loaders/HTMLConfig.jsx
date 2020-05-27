@@ -98,8 +98,6 @@ export default class HTMLConfig {
     const workerEntry = {};
     const baseHTMLReferencePathProcessorConfig = {
       parser,
-      fullFilePath: this.fullFilePath,
-      fullContextPath: this.fullContextPath,
       contentHash,
       entry,
       workerEntry
