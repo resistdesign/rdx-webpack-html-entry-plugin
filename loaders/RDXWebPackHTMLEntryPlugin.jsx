@@ -15,7 +15,6 @@ export default class RDXWebPackHTMLEntryPlugin {
       inputFileSystem
     } = compilation;
     const {
-      dependencies = [],
       request: fullFilePath = ''
     } = mod;
 
@@ -59,7 +58,7 @@ export default class RDXWebPackHTMLEntryPlugin {
         if (depMap.hasOwnProperty(dN)) {
           const newDep = new ImportDependency(dN);
 
-          dependencies.push(newDep);
+          mod.addDependency(newDep);
         }
       }
     }
