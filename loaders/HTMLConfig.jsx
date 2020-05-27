@@ -68,10 +68,6 @@ export const getHTMLReferencePathProcessor = ({
     fullRequesterFilePath: fullFilePath,
     relativeImportPath: sourcePath
   });
-  const fullInputPath = Path.join(
-    Path.dirname(fullFilePath),
-    outputPath
-  );
 
   if (
     // Skip the base tag.
@@ -87,11 +83,12 @@ export const getHTMLReferencePathProcessor = ({
       )
     )
   ) {
+    console.log('OUTPUT PATH:', outputPath);
     if (sourceIsWorker) {
       // Sort out Web Workers for separate compilation.
-      workerEntry[outputPath] = fullInputPath;
+      workerEntry[outputPath] = outputPath;
     } else {
-      entry[outputPath] = fullInputPath;
+      entry[outputPath] = outputPath;
     }
 
     elem.attr(attrName, `${sourcePath}?${contentHash}`);

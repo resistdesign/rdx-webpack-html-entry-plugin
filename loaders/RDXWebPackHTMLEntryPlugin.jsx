@@ -1,4 +1,5 @@
 import HTMLConfig from './HTMLConfig';
+import ImportDependency from 'webpack/lib/dependencies/ImportDependency';
 
 const HTML_EXT_REGEX = /\.html?$/i;
 
@@ -15,10 +16,9 @@ export default class RDXWebPackHTMLEntryPlugin {
       inputFileSystem
     } = compilation;
     const {
+      dependencies = [],
       request: fullFilePath = ''
     } = mod;
-
-    console.log(Object.keys(mod));
 
     if (HTML_EXT_REGEX.test(fullFilePath)) {
       const htmlConfig = new HTMLConfig({
@@ -41,6 +41,14 @@ export default class RDXWebPackHTMLEntryPlugin {
         source: () => content,
         size: () => content.length
       };
+
+      for (const dN in depMap) {
+        if (depMap.hasOwnProperty(dN)) {
+          const newDep = new ImportDependency(dN);
+
+          dependencies.push(newDep);
+        }
+      }
     }
   };
 
