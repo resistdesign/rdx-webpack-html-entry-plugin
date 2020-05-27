@@ -30,7 +30,9 @@ module.exports = {
     path: Path.resolve('./public')
   },
   plugins: [
-    new CleanWebpackPlugin(),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: ['**/*']
+    }),
     new RDXWebPackHTMLEntryPlugin()
   ],
   module: {

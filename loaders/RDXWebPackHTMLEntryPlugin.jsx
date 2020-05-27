@@ -1,7 +1,23 @@
 import HTMLConfig from './HTMLConfig';
 import ImportDependency from 'webpack/lib/dependencies/ImportDependency';
+import JavascriptGenerator from 'webpack/lib/JavascriptGenerator';
 
 const HTML_EXT_REGEX = /\.html?$/i;
+
+class IgnoreGenerator extends JavascriptGenerator {
+  static TYPES = new Set(['ignore']);
+
+  getTypes() {
+    return IgnoreGenerator.TYPES;
+  }
+
+  generate(module, dependencyTemplates, runtimeTemplate) {
+    return {
+      source: () => '',
+      size: () => 0
+    };
+  }
+}
 
 export default class RDXWebPackHTMLEntryPlugin {
   static PLUGIN_NAME = 'RDXWebPackHTMLEntryPlugin';
@@ -56,6 +72,8 @@ export default class RDXWebPackHTMLEntryPlugin {
           mod.addDependency(newDep);
         }
       }
+
+      mod.shouldPreventParsing = () => true;
     }
   };
 
@@ -66,5 +84,16 @@ export default class RDXWebPackHTMLEntryPlugin {
 
   apply = (compiler) => {
     compiler.hooks.compilation.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, this.configureCompilation);
+    compiler.hooks.normalModuleFactory.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, normalModuleFactory => {
+      normalModuleFactory.hooks.afterResolve.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, result => {
+        const {
+          resource = ''
+        } = result;
+
+        if (HTML_EXT_REGEX.test(resource)) {
+          result.generator = new IgnoreGenerator();
+        }
+      });
+    });
   };
 }
