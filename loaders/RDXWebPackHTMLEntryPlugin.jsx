@@ -1,4 +1,3 @@
-import FS from 'fs';
 import HTMLConfig from './HTMLConfig';
 
 export default class RDXWebPackHTMLEntryPlugin {
@@ -9,15 +8,18 @@ export default class RDXWebPackHTMLEntryPlugin {
       assets,
       compiler: {
         context: fullContextPath = ''
-      } = {}
+      } = {},
+      inputFileSystem
     } = compilation;
     const {
       request: fullFilePath = ''
     } = module;
 
+    console.log(Object.keys(compilation));
+
     if (/\.html?$/i.test(fullFilePath)) {
       const htmlConfig = new HTMLConfig({
-        content: FS.readFileSync(fullFilePath, {encoding: 'utf8'}),
+        content: inputFileSystem.readFileSync(fullFilePath, {encoding: 'utf8'}),
         fullFilePath,
         fullContextPath
       });
