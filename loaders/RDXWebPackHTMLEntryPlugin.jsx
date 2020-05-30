@@ -13,8 +13,8 @@ class IgnoreGenerator extends JavascriptGenerator {
 
   generate(module, dependencyTemplates, runtimeTemplate) {
     return {
-      source: () => '',
-      size: () => 0
+      source: () => undefined,
+      size: () => undefined
     };
   }
 }
