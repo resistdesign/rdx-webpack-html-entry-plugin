@@ -1,4 +1,3 @@
-require('resistdesign-babel-register');
 const Path = require('path');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const {getEntryMapFromHTMLFileList} = require('./loaders/HTMLConfig');
