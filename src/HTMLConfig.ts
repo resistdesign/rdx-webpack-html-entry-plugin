@@ -73,13 +73,19 @@ export const getHTMLReferencePathProcessor = ({
   }
 };
 
-export default class HTMLConfig {
-  content;
-  fullFilePath;
-  fullContextPath;
+export interface HTMLConfigOptions {
+  content?: string,
+  fullFilePath: string,
+  fullContextPath: string
+}
 
-  constructor(config = {}) {
-    Object.assign(this, config);
+export default class HTMLConfig {
+  content: string;
+  fullFilePath: string;
+  fullContextPath: string;
+
+  constructor(options: HTMLConfigOptions) {
+    Object.assign(this, options);
   }
 
   getCurrentData = () => {

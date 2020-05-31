@@ -4,12 +4,13 @@
   "description": "RDX WebPack HTML Entry Plugin",
   "main": "dist/index.js",
   "scripts": {
-    "build": "echo TODO"
+    "build": "tsc ./src --outDir ./dist"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.3"
+    "cheerio": "^1.0.0-rc.3",
+    "typescript": "^3.9.3"
   }
 }
