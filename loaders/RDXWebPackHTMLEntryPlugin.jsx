@@ -2,7 +2,9 @@ import HTMLConfig from './HTMLConfig';
 import ImportDependency from 'webpack/lib/dependencies/ImportDependency';
 import JavascriptGenerator from 'webpack/lib/JavascriptGenerator';
 
-const HTML_EXT_REGEX = /\.html?$/i;
+export const PLUGIN_NAME = 'RDXWebPackHTMLEntryPlugin';
+export const HTML_EXT_REGEX = /\.html?$/i;
+export const HTML_JS_EXT_REGEX = /\.html?\.js$/i;
 
 class IgnoreGenerator extends JavascriptGenerator {
   static TYPES = new Set(['ignore']);
@@ -19,10 +21,7 @@ class IgnoreGenerator extends JavascriptGenerator {
   }
 }
 
-export default class RDXWebPackHTMLEntryPlugin {
-  static PLUGIN_NAME = 'RDXWebPackHTMLEntryPlugin';
-  static HTML_EXT_REGEX = HTML_EXT_REGEX;
-
+export class RDXWebPackHTMLEntryPlugin {
   getModuleBuilder = compilation => mod => {
     const {
       compiler: {
@@ -77,29 +76,28 @@ export default class RDXWebPackHTMLEntryPlugin {
     }
   };
 
-  configureCompilation = compilation => {
-    compilation.hooks.buildModule.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, this.getModuleBuilder(compilation));
-    compilation.hooks.rebuildModule.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, this.getModuleBuilder(compilation));
-    compilation.hooks.afterSeal.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, () => {
-      console.log('COMP assets:', Object.keys(compilation.assets));
-      const {
-        assets = {}
-      } = compilation;
-      const assetNames = Object.keys(assets);
+  getDeadAssetRemover = compilation => () => {
+    const {
+      assets = {}
+    } = compilation;
 
-      assetNames.forEach(aN => {
-        // TRICKY: !!! Remove Unnecessary `.html.js` assets !!!
-        if (/\.html\.js$/i.test(aN)) {
-          delete assets[aN];
-        }
-      })
-    });
+    for (const aN in assets) {
+      if (assets.hasOwnProperty(aN) && HTML_JS_EXT_REGEX.test(aN)) {
+        delete assets[aN];
+      }
+    }
+  };
+
+  configureCompilation = compilation => {
+    compilation.hooks.buildModule.tap(PLUGIN_NAME, this.getModuleBuilder(compilation));
+    compilation.hooks.rebuildModule.tap(PLUGIN_NAME, this.getModuleBuilder(compilation));
+    compilation.hooks.afterSeal.tap(PLUGIN_NAME, this.getDeadAssetRemover(compilation));
   };
 
   apply = (compiler) => {
-    compiler.hooks.compilation.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, this.configureCompilation);
-    compiler.hooks.normalModuleFactory.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, normalModuleFactory => {
-      normalModuleFactory.hooks.afterResolve.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, result => {
+    compiler.hooks.compilation.tap(PLUGIN_NAME, this.configureCompilation);
+    compiler.hooks.normalModuleFactory.tap(PLUGIN_NAME, normalModuleFactory => {
+      normalModuleFactory.hooks.afterResolve.tap(PLUGIN_NAME, result => {
         const {
           resource = ''
         } = result;
@@ -111,3 +109,5 @@ export default class RDXWebPackHTMLEntryPlugin {
     });
   };
 }
+
+export default RDXWebPackHTMLEntryPlugin;

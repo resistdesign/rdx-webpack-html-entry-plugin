@@ -2,7 +2,7 @@ require('resistdesign-babel-register');
 const Path = require('path');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const {getEntryMapFromHTMLFileList} = require('./loaders/HTMLConfig');
-const RDXWebPackHTMLEntryPlugin = require('./loaders/RDXWebPackHTMLEntryPlugin');
+const {RDXWebPackHTMLEntryPlugin, HTML_EXT_REGEX} = require('./loaders/RDXWebPackHTMLEntryPlugin');
 
 const context = Path.resolve(__dirname, 'src');
 const htmlFullFilePathList = [
@@ -38,7 +38,7 @@ module.exports = {
   module: {
     rules: [
       {
-        exclude: RDXWebPackHTMLEntryPlugin.HTML_EXT_REGEX,
+        exclude: HTML_EXT_REGEX,
         loader: require.resolve('file-loader'),
         options: {
           name: '[path][name].[ext]?[contenthash]',
