@@ -80,6 +80,20 @@ export default class RDXWebPackHTMLEntryPlugin {
   configureCompilation = compilation => {
     compilation.hooks.buildModule.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, this.getModuleBuilder(compilation));
     compilation.hooks.rebuildModule.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, this.getModuleBuilder(compilation));
+    compilation.hooks.afterSeal.tap(RDXWebPackHTMLEntryPlugin.PLUGIN_NAME, () => {
+      console.log('COMP assets:', Object.keys(compilation.assets));
+      const {
+        assets = {}
+      } = compilation;
+      const assetNames = Object.keys(assets);
+
+      assetNames.forEach(aN => {
+        // TRICKY: !!! Remove Unnecessary `.html.js` assets !!!
+        if (/\.html\.js$/i.test(aN)) {
+          delete assets[aN];
+        }
+      })
+    });
   };
 
   apply = (compiler) => {
