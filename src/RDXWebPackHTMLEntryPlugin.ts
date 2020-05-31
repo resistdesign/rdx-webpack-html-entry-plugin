@@ -50,6 +50,7 @@ export class RDXWebPackHTMLEntryPlugin {
         ...workerEntry
       };
       const currentAsset = compilation.getAsset(relativeHTMLPath);
+      // TODO: Provide a source with dynamic methods so that content hashes can be updated from the import dependencies.
       const assetSource = mod.createSourceForAsset(relativeHTMLPath, content);
 
       if (!currentAsset) {
@@ -66,6 +67,7 @@ export class RDXWebPackHTMLEntryPlugin {
 
       for (const dN in depMap) {
         if (depMap.hasOwnProperty(dN)) {
+          // TODO: Create a custom import dependency class that can update the content hashes on the HTMLConfig once loaded.
           const newDep = new ImportDependency(dN);
 
           mod.addDependency(newDep);

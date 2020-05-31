@@ -48,6 +48,7 @@ export const getHTMLReferencePathProcessor = ({
   const asValue = `${elem.attr('as')}`.toLowerCase();
   const sourceIsWorker = asValue === HTML_PROCESSING_FLAGS.WORKER;
 
+  // TODO: Detect package paths?
   if (
     // Skip the base tag.
     tagName !== HTML_PROCESSING_FLAGS.BASE &&
