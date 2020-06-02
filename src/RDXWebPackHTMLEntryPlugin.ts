@@ -1,5 +1,15 @@
 import HTMLConfig from './HTMLConfig';
+// @ts-ignore
+import Compiler from 'webpack/lib/Compiler';
+// @ts-ignore
+import Compilation from 'webpack/lib/Compilation';
+// @ts-ignore
+import NormalModuleFactory, {} from 'webpack/lib/NormalModuleFactory';
+// @ts-ignore
+import NormalModule from 'webpack/lib/NormalModule';
+// @ts-ignore
 import ImportDependency from 'webpack/lib/dependencies/ImportDependency';
+// @ts-ignore
 import JavascriptGenerator from 'webpack/lib/JavascriptGenerator';
 
 export const PLUGIN_NAME = 'RDXWebPackHTMLEntryPlugin';
@@ -13,7 +23,7 @@ class IgnoreGenerator extends JavascriptGenerator {
     return IgnoreGenerator.TYPES;
   }
 
-  generate(module, dependencyTemplates, runtimeTemplate) {
+  generate() {
     return {
       source: () => undefined,
       size: () => undefined
@@ -22,7 +32,7 @@ class IgnoreGenerator extends JavascriptGenerator {
 }
 
 export class RDXWebPackHTMLEntryPlugin {
-  getModuleBuilder = compilation => mod => {
+  getModuleBuilder = (compilation: Compilation) => (mod: NormalModule) => {
     const {
       compiler: {
         context: fullContextPath = ''
@@ -78,7 +88,7 @@ export class RDXWebPackHTMLEntryPlugin {
     }
   };
 
-  getDeadAssetRemover = compilation => () => {
+  getDeadAssetRemover = (compilation: Compilation) => () => {
     const {
       assets = {}
     } = compilation;
@@ -90,16 +100,19 @@ export class RDXWebPackHTMLEntryPlugin {
     }
   };
 
-  configureCompilation = compilation => {
+  configureCompilation = (compilation: Compilation) => {
     compilation.hooks.buildModule.tap(PLUGIN_NAME, this.getModuleBuilder(compilation));
     compilation.hooks.rebuildModule.tap(PLUGIN_NAME, this.getModuleBuilder(compilation));
     compilation.hooks.afterSeal.tap(PLUGIN_NAME, this.getDeadAssetRemover(compilation));
   };
 
-  apply = (compiler) => {
+  apply = (compiler: Compiler) => {
     compiler.hooks.compilation.tap(PLUGIN_NAME, this.configureCompilation);
-    compiler.hooks.normalModuleFactory.tap(PLUGIN_NAME, normalModuleFactory => {
-      normalModuleFactory.hooks.afterResolve.tap(PLUGIN_NAME, result => {
+    compiler.hooks.normalModuleFactory.tap(PLUGIN_NAME, (normalModuleFactory: NormalModuleFactory) => {
+      normalModuleFactory.hooks.afterResolve.tap(PLUGIN_NAME, (result: {
+        resource: string,
+        generator: JavascriptGenerator
+      }) => {
         const {
           resource = ''
         } = result;
