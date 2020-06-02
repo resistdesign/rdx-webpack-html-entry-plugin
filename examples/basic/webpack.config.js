@@ -1,27 +1,18 @@
 const Path = require('path');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
-const {getEntryMapFromHTMLFileList} = require('./loaders/HTMLConfig');
-const {RDXWebPackHTMLEntryPlugin, HTML_EXT_REGEX} = require('./loaders/RDXWebPackHTMLEntryPlugin');
-
-const context = Path.resolve(__dirname, 'src');
-const htmlFullFilePathList = [
-  Path.join(context, './index.html'),
-  Path.join(context, './junk/index.html')
-];
+const {RDXWebPackHTMLEntryPlugin, HTML_EXT_REGEX} = require('../../dist');
 
 module.exports = {
   mode: 'development',
-  entry: () => getEntryMapFromHTMLFileList(
-    htmlFullFilePathList,
-    context
-  ),
-  context,
+  entry: {
+    'index.html': './index.html',
+    'odd-ball.htm': './odd-ball.htm',
+    'other/index.html': './other/index.html'
+  },
+  context: Path.resolve(__dirname, 'src'),
   resolve: {
     extensions: [
       '.js',
-      '.jsx',
-      '.ts',
-      '.tsx',
       '.json'
     ]
   },
