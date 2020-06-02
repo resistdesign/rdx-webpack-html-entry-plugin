@@ -20,5 +20,8 @@
     "@types/cheerio": "^0.22.18",
     "@types/webpack": "^4.41.17",
     "webpack": "^4.43.0"
+  },
+  "engines": {
+    "node": ">=10.0.0"
   }
 }
