@@ -1,6 +1,6 @@
 const Path = require('path');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
-const {RDXWebPackHTMLEntryPlugin, HTML_EXT_REGEX} = require('../../dist');
+const {RDXWebPackHTMLEntryPlugin, HTML_EXT_REGEX} = require('./dist');
 
 module.exports = {
   mode: 'development',
