@@ -9,24 +9,10 @@ const HTML_PROCESSING_FLAGS = {
   PREFETCH: 'prefetch',
   WORKER: 'worker'
 };
-export const includeDotInRelativePath = (relativePath) => Path.isAbsolute(relativePath) ||
+export const includeDotInRelativePath = (relativePath: string) => Path.isAbsolute(relativePath) ||
 relativePath.indexOf(`..${Path.sep}`) === 0 ?
   relativePath :
   `.${Path.sep}${relativePath}`;
-export const getEntryMapFromHTMLFileList = (htmlFileList = [], context = '') => htmlFileList
-  .reduce((acc, k) => {
-    const entry = includeDotInRelativePath(
-      Path.relative(
-        context,
-        k
-      )
-    );
-
-    return {
-      ...acc,
-      [entry]: entry
-    };
-  }, {});
 export const getContentHash = (content = '') => {
   const hash = Crypto.createHash('sha256');
 
@@ -35,12 +21,18 @@ export const getContentHash = (content = '') => {
   return hash.digest('hex');
 };
 export const getHTMLReferencePathProcessor = ({
-                                                parser = {},
+                                                parser,
                                                 attrName = '',
                                                 contentHash = '',
                                                 entry = {},
                                                 workerEntry = {}
-                                              } = {}) => function () {
+                                              }: {
+  parser: Function,
+  attrName: string,
+  contentHash: string,
+  entry: { [key: string]: string },
+  workerEntry: { [key: string]: string }
+}) => function () {
   const elem = parser(this);
   const tagName = `${this.tagName}`.toLowerCase();
   const sourcePath = elem.attr(attrName) || '';

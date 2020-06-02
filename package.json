@@ -17,6 +17,7 @@
     "webpack": ">=4.43.0"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.18",
     "@types/webpack": "^4.41.17",
     "webpack": "^4.43.0"
   }
