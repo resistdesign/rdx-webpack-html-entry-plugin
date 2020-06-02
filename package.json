@@ -4,7 +4,7 @@
   "description": "RDX WebPack HTML Entry Plugin",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc ./src --outDir ./dist"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
