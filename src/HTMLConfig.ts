@@ -43,7 +43,6 @@ export const getHTMLReferencePathProcessor = ({
   const asValue = `${elem.attr('as')}`.toLowerCase();
   const sourceIsWorker = asValue === HTML_PROCESSING_FLAGS.WORKER;
 
-  // TODO: Detect package paths?
   if (
     // Skip the base tag.
     tagName !== HTML_PROCESSING_FLAGS.BASE &&
@@ -65,6 +64,7 @@ export const getHTMLReferencePathProcessor = ({
       entry[sourcePath] = sourcePath;
     }
 
+    // TODO: What to do with a package path? Example: `@scope/my-awesome-js-thing`
     elem.attr(attrName, `${sourcePath}?${importHashMap[sourcePath] || contentHash}`);
   }
 };
@@ -109,8 +109,6 @@ export default class HTMLConfig {
       entry,
       workerEntry
     };
-
-    console.log('HTML IMPORT MAP:', this.importHashMap);
 
     hrefNodes.each(getHTMLReferencePathProcessor({
       ...baseHTMLReferencePathProcessorConfig,

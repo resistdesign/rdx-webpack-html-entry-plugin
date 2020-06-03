@@ -53,6 +53,46 @@ class IgnoreGenerator extends JavascriptGenerator {
   }
 }
 
+class HTMLModule extends NormalModule {
+  generator: any;
+
+  constructor(...args: any) {
+    super(...args);
+
+    this.generator = new IgnoreGenerator();
+  }
+
+  shouldPreventParsing = () => true;
+}
+
+interface HTMLSourceOptions {
+  htmlConfig?: HTMLConfig;
+}
+
+class HTMLSource {
+  htmlConfig: HTMLConfig;
+
+  constructor(options: HTMLSourceOptions = {}) {
+    Object.assign(this, options);
+  }
+
+  source = () => {
+    const {
+      content = ''
+    } = this.htmlConfig.getCurrentData();
+
+    return content;
+  };
+
+  size = () => {
+    const {
+      content = ''
+    } = this.htmlConfig.getCurrentData();
+
+    return content.length;
+  };
+}
+
 export class RDXWebPackHTMLEntryPlugin {
   getModuleBuilder = (compilation: Compilation) => (mod: NormalModule) => {
     const {
@@ -72,7 +112,6 @@ export class RDXWebPackHTMLEntryPlugin {
         fullContextPath
       });
       const {
-        content = '',
         relativeHTMLPath,
         entry,
         workerEntry
@@ -82,8 +121,9 @@ export class RDXWebPackHTMLEntryPlugin {
         ...workerEntry
       };
       const currentAsset = compilation.getAsset(relativeHTMLPath);
-      // TODO: Provide a source with dynamic methods so that content hashes can be updated from the import dependencies.
-      const assetSource = mod.createSourceForAsset(relativeHTMLPath, content);
+      const assetSource = new HTMLSource({
+        htmlConfig
+      });
 
       if (!currentAsset) {
         compilation.emitAsset(
@@ -107,8 +147,6 @@ export class RDXWebPackHTMLEntryPlugin {
           mod.addDependency(newDep);
         }
       }
-
-      mod.shouldPreventParsing = () => true;
     }
   };
 
@@ -143,16 +181,22 @@ export class RDXWebPackHTMLEntryPlugin {
   apply = (compiler: Compiler) => {
     compiler.hooks.compilation.tap(PLUGIN_NAME, this.configureCompilation);
     compiler.hooks.normalModuleFactory.tap(PLUGIN_NAME, (normalModuleFactory: NormalModuleFactory) => {
-      normalModuleFactory.hooks.afterResolve.tap(PLUGIN_NAME, (result: {
+      normalModuleFactory.hooks.afterResolve.tap(PLUGIN_NAME, (resolveData: {
         resource: string,
-        generator: JavascriptGenerator
+        createData: any
       }) => {
         const {
-          resource = ''
-        } = result;
+          resource = '',
+          createData
+        } = resolveData;
 
         if (HTML_EXT_REGEX.test(resource)) {
-          result.generator = new IgnoreGenerator();
+          // TODO: Fix HTML module configuration.
+          return normalModuleFactory.hooks.module.call(
+            new HTMLModule(createData),
+            createData,
+            resolveData
+          );
         }
       });
     });
