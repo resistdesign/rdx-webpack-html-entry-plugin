@@ -1,6 +1,7 @@
 import Crypto from 'crypto';
 import Path from 'path';
 import Cheerio from 'cheerio';
+import has = Reflect.has;
 
 const URL_REGEX = /^([a-z]|:)*?(?<!\/.)\/\/[a-z0-9-.]*?($|\/.*?$|\?.*?$)/gmi;
 const HTML_PROCESSING_FLAGS = {
@@ -25,13 +26,15 @@ export const getHTMLReferencePathProcessor = ({
                                                 attrName = '',
                                                 contentHash = '',
                                                 entry = {},
-                                                workerEntry = {}
+                                                workerEntry = {},
+                                                importHashMap = {}
                                               }: {
   parser: Function,
   attrName: string,
   contentHash: string,
   entry: { [key: string]: string },
-  workerEntry: { [key: string]: string }
+  workerEntry: { [key: string]: string },
+  importHashMap: { [key: string]: any }
 }) => function () {
   const elem = parser(this);
   const tagName = `${this.tagName}`.toLowerCase();
@@ -62,7 +65,7 @@ export const getHTMLReferencePathProcessor = ({
       entry[sourcePath] = sourcePath;
     }
 
-    elem.attr(attrName, `${sourcePath}?${contentHash}`);
+    elem.attr(attrName, `${sourcePath}?${importHashMap[sourcePath] || contentHash}`);
   }
 };
 
@@ -76,10 +79,15 @@ export default class HTMLConfig {
   content: string;
   fullFilePath: string;
   fullContextPath: string;
+  importHashMap: { [key: string]: any } = {};
 
   constructor(options: HTMLConfigOptions) {
     Object.assign(this, options);
   }
+
+  updateHashForImportedDependency = (name: string, hash: any) => {
+    this.importHashMap[name] = hash;
+  };
 
   getCurrentData = () => {
     const contentHash = getContentHash(this.content);
@@ -102,17 +110,22 @@ export default class HTMLConfig {
       workerEntry
     };
 
+    console.log('HTML IMPORT MAP:', this.importHashMap);
+
     hrefNodes.each(getHTMLReferencePathProcessor({
       ...baseHTMLReferencePathProcessorConfig,
-      attrName: 'href'
+      attrName: 'href',
+      importHashMap: this.importHashMap
     }));
     srcNodes.each(getHTMLReferencePathProcessor({
       ...baseHTMLReferencePathProcessorConfig,
-      attrName: 'src'
+      attrName: 'src',
+      importHashMap: this.importHashMap
     }));
     metaAppConfigNodes.each(getHTMLReferencePathProcessor({
       ...baseHTMLReferencePathProcessorConfig,
-      attrName: 'content'
+      attrName: 'content',
+      importHashMap: this.importHashMap
     }));
 
     return {

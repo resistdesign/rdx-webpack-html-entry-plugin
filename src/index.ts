@@ -16,6 +16,28 @@ export const PLUGIN_NAME = 'RDXWebPackHTMLEntryPlugin';
 export const HTML_EXT_REGEX = /\.html?$/i;
 export const HTML_JS_EXT_REGEX = /\.html?\.js$/i;
 
+class HTMLImportDependency extends ImportDependency {
+  htmlImportName: string;
+  htmlConfig: HTMLConfig;
+
+  constructor(...args: any) {
+    super(...args);
+  }
+
+  get type() {
+    return 'import()';
+  }
+
+  updateHash(hash: any, chunkGraph: any) {
+    super.updateHash(hash, chunkGraph);
+
+    this.htmlConfig.updateHashForImportedDependency(
+      this.htmlImportName,
+      hash
+    );
+  }
+}
+
 class IgnoreGenerator extends JavascriptGenerator {
   static TYPES = new Set(['ignore']);
 
@@ -77,8 +99,10 @@ export class RDXWebPackHTMLEntryPlugin {
 
       for (const dN in depMap) {
         if (depMap.hasOwnProperty(dN)) {
-          // TODO: Create a custom import dependency class that can update the content hashes on the HTMLConfig once loaded.
-          const newDep = new ImportDependency(dN);
+          const newDep = new HTMLImportDependency(dN);
+
+          newDep.htmlImportName = dN;
+          newDep.htmlConfig = htmlConfig;
 
           mod.addDependency(newDep);
         }
@@ -100,10 +124,20 @@ export class RDXWebPackHTMLEntryPlugin {
     }
   };
 
-  configureCompilation = (compilation: Compilation) => {
+  configureCompilation = (compilation: Compilation, {
+    contextModuleFactory,
+    normalModuleFactory
+  }: {
+    contextModuleFactory: any,
+    normalModuleFactory: any
+  }) => {
     compilation.hooks.buildModule.tap(PLUGIN_NAME, this.getModuleBuilder(compilation));
     compilation.hooks.rebuildModule.tap(PLUGIN_NAME, this.getModuleBuilder(compilation));
     compilation.hooks.afterSeal.tap(PLUGIN_NAME, this.getDeadAssetRemover(compilation));
+    compilation.dependencyFactories.set(
+      HTMLImportDependency,
+      normalModuleFactory
+    );
   };
 
   apply = (compiler: Compiler) => {

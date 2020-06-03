@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "cp -a ../../dist ./dist && webpack"
+    "build:plugin": "EXM_DIR=$(pwd) cd ../../; npm run build; cd $EXM_DIR",
+    "build": "npm run build:plugin && rm -rf ./dist && cp -a ../../dist ./dist && webpack"
   },
   "keywords": [],
   "author": "",
