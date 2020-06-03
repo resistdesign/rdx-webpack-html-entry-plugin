@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "build:clean": "rm -rf ./dist && rm -rf ./public",
     "build:plugin": "EXM_DIR=$(pwd) cd ../../; npm run build; cd $EXM_DIR",
-    "build": "npm run build:plugin && rm -rf ./dist && cp -a ../../dist ./dist && webpack"
+    "build:install": "cp -a ../../dist ./dist",
+    "build": "npm run build:clean && npm run build:plugin && npm run build:install && webpack"
   },
   "keywords": [],
   "author": "",

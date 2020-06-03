@@ -163,10 +163,8 @@ export class RDXWebPackHTMLEntryPlugin {
   };
 
   configureCompilation = (compilation: Compilation, {
-    contextModuleFactory,
     normalModuleFactory
   }: {
-    contextModuleFactory: any,
     normalModuleFactory: any
   }) => {
     compilation.hooks.buildModule.tap(PLUGIN_NAME, this.getModuleBuilder(compilation));
@@ -182,15 +180,15 @@ export class RDXWebPackHTMLEntryPlugin {
     compiler.hooks.compilation.tap(PLUGIN_NAME, this.configureCompilation);
     compiler.hooks.normalModuleFactory.tap(PLUGIN_NAME, (normalModuleFactory: NormalModuleFactory) => {
       normalModuleFactory.hooks.afterResolve.tap(PLUGIN_NAME, (resolveData: {
-        resource: string,
+        request: string,
         createData: any
       }) => {
         const {
-          resource = '',
+          request = '',
           createData
         } = resolveData;
 
-        if (HTML_EXT_REGEX.test(resource)) {
+        if (HTML_EXT_REGEX.test(request)) {
           // TODO: Fix HTML module configuration.
           return normalModuleFactory.hooks.module.call(
             new HTMLModule(createData),
